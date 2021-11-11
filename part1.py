@@ -8,21 +8,10 @@ Created on Thu Nov 11 14:16:35 2021
 """
 
 import  numpy  as  np
-import pylab
+
 from scipy import stats
 from scipy import signal
 
-def plot_histogram(name, values, units)  :     
-    #find binwidth, use Freeman-Diaconis rule
-    mass_iqr = stats.iqr(values)
-    bin_width = 2*mass_iqr/((nevent)**(1/3))    
-    num_bins = int(2/bin_width)
-    pylab.hist(values,  bins=num_bins,  range=[np.min(values), np.max(values)])
-    pylab.title("Histogram of " + name + " data" )
-    pylab.ylabel("Counts in bin")
-    pylab.xlabel(name + " " + units)
-    pylab.xlim(np.min(values), np.max(values))
-    pylab.show()
 
 f  =  open("ups-15-small.bin","rb")
 datalist  =  np.fromfile(f, dtype=np.float32)
