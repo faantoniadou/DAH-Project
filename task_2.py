@@ -1,23 +1,23 @@
 """
 function finding code
 """
-
 import  numpy  as  np
 import pylab
 from scipy import stats
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
-
+import scipy.stats as ss
 
 #  import  data
 #xmass  =  np.loadtxt(sys.argv[1])
 
 
-def plot_histogram(name, values, units)  :     
+
+def plot_histogram(name, values, units):     
     #find binwidth, use Freeman-Diaconis rule
     mass_iqr = stats.iqr(values)
-    bin_width = 5 * mass_iqr/((nevent)**(1/3))    
+    bin_width = 2 * mass_iqr/((nevent)**(1/3))    
     num_bins = int(2/bin_width)
     pylab.hist(values,  bins=num_bins,  range=[np.min(values), np.max(values)])
     pylab.title("Histogram of " + name + " data" )
@@ -48,6 +48,11 @@ region1 =  np.array(xmass)[np.where((xmass > 9.0) & (xmass < 9.75))]
 '''
 at this point we are estimating the point where the peak starts to define the background
 '''
+'''
+here we can define the edges but we'll do that with Niamh's cool method again later
+'''
+edge1 = 9.29
+edge2 = 9.61
 
 def background():
     # number of events
@@ -55,8 +60,8 @@ def background():
     #print(N_X)
 
     # define sideband regions each be half as wide as the signal region 
-    side_low = xmass[np.where((xmass < 9.29) & (xmass > 9.0))]
-    side_high = xmass[np.where((xmass < 9.75) & (xmass > 9.61))]
+    side_low = xmass[np.where((xmass < edge1) & (xmass > 9.0))]
+    side_high = xmass[np.where((xmass < 9.75) & (xmass > edge2))]
 
     # concatenate these arrays to get a dataset for background
     bg_data = np.hstack((side_low, side_high))
@@ -72,16 +77,31 @@ def background():
 
 
 # this is the function form that we want the data to be fitted to 
-def exp_decay(data, a, b, c):
-    return a * np.exp(-b * data) + c
+def exp_decay(data, a, b):
+    return a * np.exp(-b * data)
 
 bg_data = background()[0]
 bg_all = background()[2]
 
+# this is the peak data for the histogram
+peak_data = xmass[np.where((xmass > edge1) & (xmass < edge2))]
+
 def plot_bg():
     plot_histogram(xmass_name, bg_all, xmass_units)
 
-plot_bg()
+#plot_bg()
 ydata = background()[1]
-popt, pcov = curve_fit(lambda t, a, b: a * np.exp(b*t),  bg_data,  ydata, maxfev=5000)
+popt, pcov = curve_fit(lambda t, a, b: a * np.exp(-b*t),  bg_data,  ydata, maxfev=5000)
 print(popt)
+
+
+def fit_bg():
+    '''
+    generate background data in the peak region 
+    '''
+    bg_analytic = exp_decay(peak_data, popt[0], popt[1])
+    return bg_analytic
+print(popt[0])
+x = np.linspace(np.min(xmass), np.max(xmass),1000)
+h = pylab.plot(x, exp_decay(x, popt[0], popt[1]))
+myhist = plot_histogram(xmass_name, xmass, xmass_units)
