@@ -8,7 +8,6 @@ Created on Thu Nov 11 14:16:35 2021
 """
 
 import  numpy  as  np
-
 from scipy import stats
 from scipy import signal
 
@@ -48,5 +47,4 @@ widths_mass = bin_width*widths #convert these widths to units of GeV/c^2
 half_widths = (widths_mass/2) #half these widths and subtract and add to the peak centre in order to get range of peak
 peak_range = (peaks_indices-half_widths, peaks_indices+half_widths)
 range_peak_1 = (peak_vals[0]-half_widths[0], peak_vals[0]+half_widths[0])
-
 ##range_peak_1 is the range to be used for peak 1 
