@@ -1,6 +1,7 @@
 """
 function finding code
 """
+
 import  numpy  as  np
 import pylab
 from scipy import stats
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import scipy.stats as ss
+
 
 
 def plot_histogram(name, values, units, normed=False):     
@@ -22,7 +24,6 @@ def plot_histogram(name, values, units, normed=False):
     pylab.ylabel("Counts in bin")
     pylab.xlabel(name + " " + units)
     pylab.show()
-
 f  =  open("ups-15-small.bin","rb")
 datalist  =  np.fromfile(f, dtype=np.float32)
 #  number  of  events
@@ -33,6 +34,7 @@ xdata  =  np.split(datalist,nevent)
 xmass  =  []
 xmass_name = str("Mass")
 xmass_units = str("[GeV/c^2]")
+
 for  i  in  range(0,nevent):
     xmass.append(xdata[i][0])
 
@@ -143,23 +145,21 @@ def gaus(x, a, x0, sigma):
 def fit_gaussian():
     '''
     This fits the first peak to a normal distribution
-    It doesn't work yet
+    IT WORKS
     '''
     x, y = remove_bg()
 
     n = len(x)                          #the number of data
-    mean = sum(x*y)/n                   
-    sigma = np.sqrt(sum(y*(x-mean)**2)/n)
+    mean = np.sum(x)/n                   
+    sigma = (np.sum(y*(x-mean)**2)/n)**0.5
 
-    popt2, pcov2 = curve_fit(gaus, x, y, p0=[max(y), 9.4551, sigma], maxfev=900000)
+    popt2, pcov2 = curve_fit(gaus, x, y, p0=[np.max(y), mean, sigma], maxfev=90000)
     a, x0, sigma = popt2
 
-    print(popt2)
+    print(mean)
     pylab.plot(x, gaus(x, a, x0, sigma))
     pylab.plot(x,y)
+    pylab.ylim(0)
     pylab.show()
+
 fit_gaussian()
-
-
-
-
