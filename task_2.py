@@ -18,20 +18,14 @@ f  =  open("ups-15-small.bin","rb")
 datalist  =  np.fromfile(f, dtype=np.float32)
 #  number  of  events
 nevent  =  int(len(datalist)/6)
-xdata  =  np.split(datalist,nevent)
+xdata  =  np.array(np.split(datalist,nevent))
 
 #  make  list  of  invariant  mass  of  events
-xmass  =  []
+xmass = xdata[:,0]
 xmass_name = str("Mass")
 xmass_units = str("[GeV/c^2]")
-for  i  in  range(0,nevent):
-    xmass.append(xdata[i][0])
-xmass = np.array(xmass)
-
 
 region1 =  np.array(xmass)[np.where((xmass > 9.0) & (xmass < 9.75))]
-
-
 
 '''
 at this point we are estimating the point where the peak starts to define the background
@@ -42,7 +36,7 @@ edge1 = 9.29
 edge2 = 9.61
 
 
-#%%
+
 def plot_histogram(name, values, units, normed=False):     
     # find binwidth, use Freeman-Diaconis rule
     mass_iqr = stats.iqr(values)
@@ -86,7 +80,7 @@ def background():
 # note edge 1 and edge 2 are just estimates. we need to use Niamh's scientific method here
 peak_data = xmass[np.where((xmass > edge1) & (xmass < edge2))]
 
-#%%
+
 def fit_bg():
     '''
     this fits the background data to an exponential decay function
@@ -111,7 +105,6 @@ fit_bg()
 #cool this works now we need to subtract this data from the original histogram
 
 
-#%%
 def remove_bg():
     #first we need to render histogram data for the whole of region1
 
@@ -172,8 +165,8 @@ def fit_gaussian():
 
 def plot_gaussian():
     x, y, a, x0, sigma = fit_gaussian()
-    pylab.plot(x, gaus(x, a, x0, sigma)/np.max(y))      # these are normalised to 1 now
-    pylab.plot(x,y/np.max(y))
+    pylab.plot(x, gaus(x, a, x0, sigma)/np.sum(y))      # these are normalised to 1 now
+    pylab.plot(x,y/np.sum(y))
     pylab.ylim(0)
     pylab.show()
 
@@ -182,12 +175,13 @@ def plot_gaussian():
 
 plot_gaussian()
 
+
 def plot_composite():
     x1, y1 = plot_gaussian()[0], plot_gaussian()[1]
     x2,x3,y2 = remove_bg()
-    pylab.plot(x1,y1+y2)
+    y_composite = y1+y2
+    pylab.plot(x1,y_composite/np.sum(y_composite))
     pylab.xlim(np.min(x1),np.max(x1))
     pylab.show
 
 plot_composite()
-
