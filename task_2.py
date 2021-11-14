@@ -1,7 +1,7 @@
 """
 function finding code
 """
-
+#%%
 import  numpy  as  np
 import pylab
 from scipy import stats
@@ -9,9 +9,40 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import scipy.stats as ss
+# Import seaborn
+#sns.set_theme('paper')
+##import seaborn as sns
+
+
+f  =  open("ups-15-small.bin","rb")
+datalist  =  np.fromfile(f, dtype=np.float32)
+#  number  of  events
+nevent  =  int(len(datalist)/6)
+xdata  =  np.split(datalist,nevent)
+
+#  make  list  of  invariant  mass  of  events
+xmass  =  []
+xmass_name = str("Mass")
+xmass_units = str("[GeV/c^2]")
+for  i  in  range(0,nevent):
+    xmass.append(xdata[i][0])
+xmass = np.array(xmass)
+
+
+region1 =  np.array(xmass)[np.where((xmass > 9.0) & (xmass < 9.75))]
 
 
 
+'''
+at this point we are estimating the point where the peak starts to define the background
+
+here we can define the edges but we'll do that with Niamh's cool method again later
+'''
+edge1 = 9.29
+edge2 = 9.61
+
+
+#%%
 def plot_histogram(name, values, units, normed=False):     
     # find binwidth, use Freeman-Diaconis rule
     mass_iqr = stats.iqr(values)
@@ -24,33 +55,7 @@ def plot_histogram(name, values, units, normed=False):
     pylab.ylabel("Counts in bin")
     pylab.xlabel(name + " " + units)
     pylab.show()
-f  =  open("ups-15-small.bin","rb")
-datalist  =  np.fromfile(f, dtype=np.float32)
-#  number  of  events
-nevent  =  int(len(datalist)/6)
-xdata  =  np.split(datalist,nevent)
 
-#  make  list  of  invariant  mass  of  events
-xmass  =  []
-xmass_name = str("Mass")
-xmass_units = str("[GeV/c^2]")
-
-for  i  in  range(0,nevent):
-    xmass.append(xdata[i][0])
-
-#plot_histogram(xmass_name, xmass, xmass_units)
-xmass = np.array(xmass)
-
-region1 =  np.array(xmass)[np.where((xmass > 9.0) & (xmass < 9.75))]
-#plot_histogram(xmass_name, region1, xmass_units)
-
-'''
-at this point we are estimating the point where the peak starts to define the background
-
-here we can define the edges but we'll do that with Niamh's cool method again later
-'''
-edge1 = 9.29
-edge2 = 9.61
 
 
 def background():
@@ -69,7 +74,7 @@ def background():
     mass_iqr = stats.iqr(region1)           # here we use region1 to maintain consistency and avoid different sized bins being used
     bin_width = 2 * mass_iqr/((nevent)**(1/3))    
     num_bins = int(2/bin_width)
-    bg_counts, bg_masses = np.histogram(bg_data, bins=num_bins, range=[np.min(bg_data), np.max(bg_data)])
+    bg_counts, bg_masses = np.histogram(bg_data, bins=num_bins, range=[np.min(bg_data), np.max(bg_data)], density=False)
 
     # get rid of empty regions 
     bg_masses = bg_masses[np.where(bg_counts != 0)]
@@ -77,25 +82,21 @@ def background():
 
     return bg_masses, bg_counts, bg_data
 
-bg_masses = background()[0]
-bg_all = background()[2]
-bg_counts = background()[1]
-
 # this is only the peak data for the histogram
 # note edge 1 and edge 2 are just estimates. we need to use Niamh's scientific method here
 peak_data = xmass[np.where((xmass > edge1) & (xmass < edge2))]
 
-def plot_bg():
-    plot_histogram(xmass_name, bg_all, xmass_units)
-
-
-
+#%%
 def fit_bg():
     '''
     this fits the background data to an exponential decay function
     returns the function variables a and b for a * np.exp(-b*t)
     '''
-    popt, pcov = curve_fit(lambda t, a, b, c: a * np.exp(-b*t),  bg_masses,  bg_counts, maxfev=90000)
+    bg_masses = background()[0]
+    bg_all = background()[2]
+    bg_counts = background()[1] 
+
+    popt, pcov = curve_fit(lambda t, a, b: a * np.exp(-b*t),  bg_masses,  bg_counts, maxfev=90000)
 
     # random dataset to display exponential decay function 
     x = np.linspace(np.min(bg_masses), np.max(bg_masses),1000)
@@ -104,12 +105,21 @@ def fit_bg():
     #pylab.plot(bg_masses, bg_counts, label='data')
     #pylab.legend()
     #pylab.show()
-    return popt
 
+    return popt[0], popt[1]
+fit_bg()
 #cool this works now we need to subtract this data from the original histogram
 
+
+#%%
 def remove_bg():
     #first we need to render histogram data for the whole of region1
+
+    bg_masses = background()[0]
+    bg_all = background()[2]
+    bg_counts = background()[1]
+
+
     mass_iqr = stats.iqr(region1)
     bin_width = 2 * mass_iqr/((nevent)**(1/3))    
     num_bins = int(2/bin_width)
@@ -117,13 +127,13 @@ def remove_bg():
     
     # create set of points to fit region1 
     x = np.linspace(np.min(all_masses), np.max(all_masses),len(all_masses)-1)
-    popt = fit_bg()
-    ydata = popt[0]*np.exp(-popt[1]*x)
+    a, b = fit_bg()
+    ydata = a * np.exp(-b * x)
     clear_data = all_counts - ydata
 
     '''
     We can plot this stuff to visualise our cleared signal
-
+    '''
     pylab.plot(all_masses[0:-1], clear_data, label='cleared signal')
     pylab.plot(all_masses[0:-1], all_counts, label='all signals')
     pylab.plot(bg_masses, bg_counts, label='background data')
@@ -135,31 +145,49 @@ def remove_bg():
     pylab.ylim(0)
     pylab.legend()
     pylab.show()
-    '''
 
-    return all_masses[0:-1], clear_data
+    return all_masses[0:-1], clear_data, ydata/np.max(ydata)
+
+remove_bg()[:]
 
 def gaus(x, a, x0, sigma):
     return a * np.exp(-(x - x0)**2 / (2 * sigma**2))
 
+
 def fit_gaussian():
     '''
     This fits the first peak to a normal distribution
-    IT WORKS
     '''
-    x, y = remove_bg()
+    x, y, ydata = remove_bg()
 
     n = len(x)                          #the number of data
     mean = np.sum(x)/n                   
     sigma = (np.sum(y*(x-mean)**2)/n)**0.5
 
-    popt2, pcov2 = curve_fit(gaus, x, y, p0=[np.max(y), mean, sigma], maxfev=90000)
+    popt2, pcov2 = curve_fit(gaus, x, y, p0=[np.max(y), mean, sigma], maxfev=900000)
     a, x0, sigma = popt2
 
-    print(mean)
-    pylab.plot(x, gaus(x, a, x0, sigma))
-    pylab.plot(x,y)
+    return x, y, a, x0, sigma
+
+
+def plot_gaussian():
+    x, y, a, x0, sigma = fit_gaussian()
+    pylab.plot(x, gaus(x, a, x0, sigma)/np.max(y))      # these are normalised to 1 now
+    pylab.plot(x,y/np.max(y))
     pylab.ylim(0)
     pylab.show()
 
-fit_gaussian()
+    return x, gaus(x, a, x0, sigma)/np.max(y)
+
+
+plot_gaussian()
+
+def plot_composite():
+    x1, y1 = plot_gaussian()[0], plot_gaussian()[1]
+    x2,x3,y2 = remove_bg()
+    pylab.plot(x1,y1+y2)
+    pylab.xlim(np.min(x1),np.max(x1))
+    pylab.show
+
+plot_composite()
+
