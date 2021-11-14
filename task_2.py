@@ -72,9 +72,6 @@ def background():
 
     return bg_masses, bg_counts, bg_data
 
-# this is only the peak data for the histogram
-# note edge 1 and edge 2 are just estimates. we need to use Niamh's scientific method here
-peak_data = xmass[np.where((xmass > edge1) & (xmass < edge2))]
 
 #%%
 def fit_bg():
