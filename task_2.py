@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import scipy.stats as ss
+from numpy import trapz
+from scipy.integrate import simps
 
 
 f  =  open("ups-15-small.bin","rb")
@@ -34,21 +36,51 @@ edge2 = 9.61
 
 
 #%%
-def plot_histogram(name, values, units, normed=False):     
+'''
+I broke this down because it makes normalising a bit easier
+'''
+
+def get_bins(values):
     # find binwidth, use Freeman-Diaconis rule
     mass_iqr = stats.iqr(values)
     bin_width = 2 * mass_iqr/((nevent)**(1/3))    
     num_bins = int(2/bin_width)
 
+    return num_bins
+
+
+def hist_data(values, normed=False):
+    # renders histogram data
+    num_bins = get_bins(values)
+    values, bins = np.histogram(values,  bins=num_bins,  range=[np.min(values), np.max(values)], density=normed)
+    
+    return values, bins
+
+
+def hist_area(values, normed):
+    #finds area of the histogram
+    values, bins = hist_data(values, normed)
+    area = np.sum(np.diff(bins) * values)
+
+    return area
+
+
+def plot_histogram(name, values, units, normed=False):     
+    
+    num_bins = get_bins(values)
     # plot
-    pylab.hist(values,  bins=num_bins,  range=[np.min(values), np.max(values)], density=normed)
+    values, bins, _ = pylab.hist(values,  bins=num_bins,  range=[np.min(values), np.max(values)], density=normed)
+
     pylab.title("Histogram of " + name + " data" )
     pylab.ylabel("Counts in bin")
     pylab.xlabel(name + " " + units)
-    pylab.show()
+    #pylab.show()
 
 
+plot_histogram(xmass_name, region1, xmass_units, normed=True)
 
+
+#%%
 def background():
     # number of events
     nevents = len(region1)
@@ -94,11 +126,8 @@ def fit_bg():
 def remove_bg():
     #first we need to render histogram data for the whole of region1
     bg_masses, bg_counts, bg_all = background()
-
-
-    mass_iqr = stats.iqr(region1)
-    bin_width = 2 * mass_iqr/((nevent)**(1/3))    
-    num_bins = int(2/bin_width)
+   
+    num_bins = get_bins(region1)
     all_counts, all_masses = np.histogram(region1, bins=num_bins, range=[np.min(region1), np.max(region1)])
     
     # create set of points to fit region1 
@@ -182,15 +211,27 @@ def plot_composite():
     '''
     Plots composite probability curve
     '''
+
+    area_hist = hist_area(region1, False)
+
     x1, y1 = fit_gaussian()[0], fit_gaussian()[5]
     x2,x3,y2 = remove_bg()[0:3]
-    y_composite = y1+y2
-    y_composite = y_composite/np.sum(y_composite)       # normalise the composite probability
-    pylab.plot(x1,y_composite)
+    y_composite = y1 + y2
+
+    area = simps(y_composite, dx=np.max(region1) - np.min(region1))
+
+    print('Area under graph = ' + str(area))
+    print('Area of histogram = ' + str(area_hist))
+
+    y_composite = y_composite * np.sum(y_composite)*2/area_hist*10**(-6)    # normalise the composite probability
+    plot_histogram(xmass_name, region1, xmass_units, normed=True) 
+
+    pylab.plot(x1, y_composite)
     pylab.xlim(np.min(x1),np.max(x1))
     pylab.xlabel(xmass_name)
     pylab.ylabel(xmass_units)
     pylab.title('Normalised composite probability curve')
+    
     pylab.show
 
 plot_composite()
