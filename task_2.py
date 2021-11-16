@@ -142,7 +142,7 @@ def bg_merge_data(region_array, edges_array):
 def bg_hist(region_array, edges_array):
     # render histogram data
     all_bg = bg_merge_data(region_array, edges_array)
-    num_bins = (get_bins(xmass)) 
+    num_bins = (get_bins(all_bg)) 
     
     bg_counts, bg_masses = hist_data(all_bg, num_bins)
 
@@ -182,7 +182,7 @@ def remove_bg(region_array, edges_array):
     #first we need to render histogram data for the whole of region1
     bg_masses, bg_counts, all_bg = bg_hist(region_array, edges_array)
 
-    numbins = get_bins(xmass)
+    numbins = get_bins(all_bg)
     
     all_counts, all_masses = hist_data(xmass, numbins)
 
@@ -199,13 +199,14 @@ def plot_bg():
     '''
     We can plot this stuff to visualise our cleared signal
     '''
-    numbins1 = get_bins(xmass)
+
+    bg_masses, bg_counts, bg_all = bg_hist(all_regions, all_edges)
+
+    numbins1 = get_bins(bg_all)
 
     teras, clear_data, exp_fit, x = remove_bg(all_regions, all_edges)
 
     allcounts, all_masses = hist_data(xmass, numbins1)
-
-    bg_masses, bg_counts, bg_all = bg_hist(all_regions, all_edges)
 
     all_masses = all_masses[0:-1]
     plot_histogram(xmass_name, bg_all[np.where(bg_all != 0)], xmass_units, numbins1, normed=False)
