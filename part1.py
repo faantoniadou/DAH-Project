@@ -48,3 +48,5 @@ half_widths = (widths_mass/2) #half these widths and subtract and add to the pea
 peak_range = (peaks_indices-half_widths, peaks_indices+half_widths)
 range_peak_1 = (peak_vals[0]-half_widths[0], peak_vals[0]+half_widths[0])
 ##range_peak_1 is the range to be used for peak 1 
+range_peak_2 = (peak_vals[1]-half_widths[1], peak_vals[1]+half_widths[1])
+range_peak_3 = (peak_vals[2]-half_widths[2], peak_vals[2]+half_widths[2])
