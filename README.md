@@ -32,9 +32,12 @@ Further analysis was done on relative production rates of Y(S1), Y(S2), Y(S3) by
 To find peak widths we used a peak finding method included in **peak_finding.py** as an approximation. These were later modified to yield best results in the analysis.
 Histograms of all data properties can be plotted through `histogram_plots.py`
 
-**All abovementioned files can be downloaded from our repository and ran on any scientific environment for Python.**
+**All abovementioned files can be downloaded from our repository and ran separately on any scientific environment for Python.**
 
-## Credits 
-<a href="https://github.com/faantoniadou/DAH-Project">
-  <img src="https://avatars.githubusercontent.com/u/63123583?s=48&v=4">
-</a>
+## Contributors 
+This project exists thanks to all the people who contributed.
+
+<a href="https://github.com/faantoniadou"><img src="https://avatars.githubusercontent.com/u/63123583?v=4" /></a>
+<a href="https://github.com/niamhyclarke"><img src="https://avatars.githubusercontent.com/u/72151616?v=4" /></a>
+
+
