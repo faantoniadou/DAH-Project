@@ -180,7 +180,7 @@ def residuals():
     frame1 = fig1.add_axes((.1,.3,.8,.6))
     bimodal = bimodal/area
     y = y/area
-    plt.title(r'Normalised probability curve and residuals for the $\Upsilon(S3)$ peak')
+    plt.title(r'Normalised probability curve and residuals for the $\Upsilon(3S)$ peak')
     #xstart, ystart, xend, yend [units are fraction of the image frame, from bottom left corner]
     plt.plot(x, gauss_peak_1, 'g', label='first gaussian')
     plt.fill_between(x, gauss_peak_1.min(), gauss_peak_1, facecolor="cyan", alpha=0.5)
