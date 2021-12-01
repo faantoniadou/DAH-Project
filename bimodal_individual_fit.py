@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import scipy.stats as ss
+import scipy.integrate as integrate
+from scipy.integrate import quad
 
 
 f  =  open("ups-15-small.bin","rb")
@@ -177,11 +179,13 @@ def plot_gaussian():
     x, y, bimodal, popt2 = fit_gaussian()
     pars_1 = popt2[0:3]
     pars_2 = popt2[3:6]
-    mean3 = x[np.where(bimodal/np.sum(bimodal) == np.max(bimodal/np.sum(bimodal)))][0]
+    area = np.trapz(bimodal, x)
+
+    mean3 = x[np.where(bimodal/area == np.max(bimodal/area))][0]
     print(mean3)
 
-    gauss_peak_1 = gaus(x, *pars_1)/np.sum(bimodal)
-    gauss_peak_2 = gaus(x, *pars_2)/np.sum(bimodal)
+    gauss_peak_1 = gaus(x, *pars_1)/area
+    gauss_peak_2 = gaus(x, *pars_2)/area
 
     pylab.plot(x, gauss_peak_1, 'c')#, label='first gaussian')
     pylab.fill_between(x, gauss_peak_1.min(), gauss_peak_1, facecolor="cyan", alpha=0.5)
@@ -190,11 +194,11 @@ def plot_gaussian():
     pylab.fill_between(x, gauss_peak_2.min(), gauss_peak_2, facecolor="yellow", alpha=0.5)    
     plt.vlines(x = pars_1[1], ymin = 0, ymax = max(gauss_peak_1), ls='--', lw=0.75, colors = 'purple', label = 'gaussian 1 mean = '+str(round(pars_1[1],4)))
     plt.vlines(x = pars_2[1], ymin = 0, ymax = max(gauss_peak_2), ls='--', lw=0.75, colors = 'magenta', label = 'gaussian 2 mean = ' + str(round(pars_2[1],4)))
-    plt.vlines(x = mean3, ymin = 0, ymax = np.max(bimodal/np.sum(bimodal)), ls='--', lw=0.75, colors = 'red', label = 'composite curve mean = ' + str(round(mean3,4)))
+    plt.vlines(x = mean3, ymin = 0, ymax = np.max(bimodal/area), ls='--', lw=0.75, colors = 'red', label = 'composite curve mean = ' + str(round(mean3,4)))
 
-    pylab.plot(x, bimodal/np.sum(bimodal), 'm', label='best fit overlapping gaussians')      # these are normalised to 1 now
+    pylab.plot(x, bimodal/area, 'm', label='best fit overlapping gaussians')      # these are normalised to 1 now
     
-    pylab.plot(x, y/np.sum(y), 'k', linewidth=0.8, label='signal data')
+    pylab.plot(x, y/area, 'k', linewidth=0.8, label='signal data')
     pylab.ylim(0)
     pylab.title(r'Normalised composite probability curve for the $\Upsilon$(S1) peak')
     pylab.xlabel(xmass_name)
@@ -228,31 +232,32 @@ def plot_composite():
     gauss_peak_2 = gaus(x1, *pars_2)
 
     y_composite = gauss_peak_1+y2+gauss_peak_2
-    mean3 = x1[np.where(y_composite/np.sum(y_composite) == np.max(y_composite/np.sum(y_composite)))]
-    print(mean3)
+    area = np.trapz(y_composite, x1)         # calculate area to normalise graph
 
-    gauss_peak_1 = gauss_peak_1/np.sum(y_composite)
-    gauss_peak_2 = gauss_peak_2/np.sum(y_composite)
+    mean3 = x1[np.where(y_composite/area == np.max(y_composite/area))]     
 
-    pylab.plot(x1, all_counts/np.sum(y_composite),'r', label='signal data')
+
+    gauss_peak_1 = gauss_peak_1/area
+    gauss_peak_2 = gauss_peak_2/area
+
+    pylab.plot(x1, all_counts/area,'r', label='signal data')
     pylab.plot(x1, gauss_peak_1, 'b')#, label='first gaussian')
     pylab.fill_between(x1, gauss_peak_1.min(), gauss_peak_1, facecolor="blue", alpha=0.5)
 
     pylab.plot(x1, gauss_peak_2, 'c')#, label='second gaussian')
     pylab.fill_between(x1, gauss_peak_2.min(), gauss_peak_2, facecolor="cyan", alpha=0.5)
 
-    pylab.plot(x1, y2/np.sum(y_composite), 'y', label='background fit')
+    pylab.plot(x1, y2/area, 'y', label='background fit')
     #pylab.plot(x2, y_composite, label='best fit probability curve')
-    pylab.fill_between(x1, 0, y2/np.sum(y_composite), facecolor="yellow", alpha=0.5)
+    pylab.fill_between(x1, 0, y2/area, facecolor="yellow", alpha=0.5)
     
 
     plt.vlines(x = pars_1[1], ymin = 0, ymax = max(gauss_peak_1), ls='--', lw=0.75, colors = 'purple', label = 'gaussian 1 mean = '+str(round(pars_1[1],4)))
     plt.vlines(x = pars_2[1], ymin = 0, ymax = max(gauss_peak_2), ls='--', lw=0.75, colors = 'magenta', label = 'guassian 2 mean = ' + str(round(pars_2[1],4)))
-    plt.vlines(x = mean3, ymin = 0, ymax = np.max(y_composite/np.sum(y_composite)), ls=':', lw=0.75, colors = 'black', label = 'composite curve mean = ' + str(round(mean3[0], 4)) )
+    plt.vlines(x = mean3, ymin = 0, ymax = np.max(y_composite/area), ls=':', lw=0.75, colors = 'black', label = 'composite curve mean = ' + str(round(mean3[0], 4)) )
 
-    #y_composite = y_composite/np.sum(y_composite)
 
-    pylab.plot(x2, y_composite/np.sum(y_composite), 'k', label='best fit composite PDF')
+    pylab.plot(x2, y_composite/area, 'k', label='best fit composite PDF')
     pylab.xlim(np.min(x1),np.max(x1))
     pylab.xlabel(xmass_name)
     pylab.ylabel(xmass_units)
@@ -265,5 +270,3 @@ def plot_composite():
     pylab.show()
 
 plot_composite()
-
-# %%
