@@ -146,7 +146,7 @@ def residuals():
     area = np.trapz(gauss,x)
 
     #y = y/area
-    plt.title(r'Best fit Gaussian and residuals for the $\Upsilon(S2)$ peak')
+    plt.title(r'Best fit Gaussian and residuals for the $\Upsilon(2S)$ peak')
 
     plt.plot(x, y/area, label='signal data') #Noisy data
     plt.plot(x, gauss/area, label='best fit gaussian') #Best fit model
