@@ -18,34 +18,54 @@ nevent  =  int(len(datalist)/6)
 xdata  =  np.array(np.split(datalist,nevent))
 
 #  make  list  of  invariant  mass  of  events
-xmass = xdata[:,0]          # just made this a bit more efficient
+xmass = xdata[:,0]
 xmass_name = r'$Mass ( \mu ^-\mu ^+)$ $(GeV/c^2)$'
 xmass_units = r'Candidates/ (25 Mev$/c^2$)'
 
-#%%
+# define region we want to focus on 
 region1 =  np.array(xmass)[np.where((xmass > 9.0) & (xmass < 9.77))]
 
-
-#at this point we are estimating the point where the peak starts to define the background
-
-#here we can define the edges but we'll do that with Niamh's cool method again later
-edge1, edge2 = 9.28981606785984, 9.604490115001488
-
-fu = 327
+fu = 327            # number to tweak the number of bins later on
 #%%
 def plot_histogram(name, values, units, normed=False, num_bins=fu):     
-    # find binwidth, use Freeman-Diaconis rule
-    
-    # plot
+    '''
+    Plots histogram of data
+    Parameters
+    ----------
+    name: string 
+        type of the data used
+    values: array 
+            data of values to be plotted
+    units: string
+            units of the data
+    num_bins: int 
+              number of bins to use for the plot
+    normed: boolean 
+            determines whether the histogram will be normalised or not
+    Returns
+    -------
+    Histogram plot
+    '''
     pylab.hist(values,  bins=num_bins,  range=[np.min(values), np.max(values)], density=normed, alpha=0.5, label='background data histogram')
     pylab.ylabel(xmass_units)
     pylab.xlabel(name + " " + units)
     pylab.legend()
     pylab.show()
 
-#%%
+
 def get_bins(values):
-    # find binwidth, use Freeman-Diaconis rule
+     '''
+    Uses Freeman-Diaconis rule to find optimum number of bins for a histogram plot
+    
+    Parameters
+    ----------
+    values: array
+            data values to be binned 
+    Returns
+    -------
+    values: float
+            best number of bins to use theoretically, according to the Freeman-Diaconis rule
+    '''
     mass_iqr = stats.iqr(values)
     bin_width = 2 * mass_iqr/((nevent)**(1/3))    
     num_bins = int(2/bin_width)
@@ -55,6 +75,18 @@ def get_bins(values):
 
 #%%
 def background():
+    '''
+    Obtains data to be used in plotting background data histogram
+  
+    Returns
+    -------
+    bg_masses: array 
+               binned masses that correspond to background signals
+    bg_counts: array
+               counts of binned background signals
+    bg_data: array 
+            all masses that correspond to background signals
+    '''
     # number of events
     nevents = len(region1)
 
@@ -70,20 +102,28 @@ def background():
     
     bg_counts, bg_masses = np.histogram(bg_data, bins=fu, range=[np.min(bg_data), np.max(bg_data)], density=False)
     bg_masses = bg_masses[:-1] + (bg_masses[1:] - bg_masses[:-1]) / 2
-    print(get_bins(region1))
-    # get rid of empty regions 
-    #bg_masses = bg_masses[np.where(bg_counts != 0)]
-    #bg_counts = bg_counts[np.where(bg_counts != 0)]
 
     return bg_masses, bg_counts, bg_data
-background()
 
-#%%
+
 def fit_bg():
     '''
-    this fits the background data to an exponential decay function
+    Fits the background data to an exponential decay function
     returns the function variables a and b for a * np.exp(-b*t)
+    Parameters
+    ----------
+    region_array: array 
+                regions to get the background from
+    edges_array: array 
+                correspoding boundaries for each region where background only exists
+    Returns
+    -------
+    popt[0]: float
+            best-fit starting counts
+    popt[1]: float
+            best-fit decay rate
     '''
+    
     bg_masses = background()[0]
     bg_all = background()[2]
     bg_counts = background()[1] 
@@ -98,6 +138,22 @@ def fit_bg():
 
 #%%
 def remove_bg():
+    '''
+    Fits the background data to an exponential decay function
+    returns the function variables a and b for a * np.exp(-b*t)
+  
+    Returns
+    -------
+    all_masses: array
+            midpoint of binned histogram masses
+    clear_data: array
+            signal data after background is removed
+    exp_fit: array
+            exponential background fit y coordinates
+    x: array
+        a set of points to plot our exponential fit against
+    '''
+    
     #first we need to render histogram data for the whole of region1
     bg_masses, bg_counts, bg_all = background()
     
@@ -116,7 +172,7 @@ def remove_bg():
 #%%
 def plot_bg():
     '''
-    We can plot this stuff to visualise our cleared signal
+    Plots graph to show result of removing background from the signal
     '''
 
     all_masses, clear_data, exp_fit, x = remove_bg()
@@ -138,17 +194,35 @@ def plot_bg():
 
 plot_bg()
 
-#%%
-
 def gaus(x, a, x0, sigma):
+    '''
+    Function to return the form of a single gaussian peak
+    '''
     return a * np.exp(-(x - x0)**2 / (2 * sigma**2))
 
 def bimodal(x, A1, mu1, sigma1, A2, mu2, sigma2):
+    '''
+    Function to return the form of overlapping gaussians
+    '''
     return gaus(x, A1, mu1, sigma1) + gaus(x, A2, mu2, sigma2)
 
 def fit_gaussian():
     
-    #This fits the first peak to a normal distribution
+    '''
+    Fits the background data to an exponential decay function
+    returns the function variables a and b for a * np.exp(-b*t)
+
+    Returns
+    -------
+    x: array
+       a set of points along the horizontal axis to fit peaks
+    y: array
+        y-coordinates of background fit
+    bimodal(...): array
+                y axis data points for array of x values to fitted to overlapping gaussians
+    popt2: array
+            optimal parameters calculated by curve_fit for the overlapped gaussian fit
+    '''
     
     x, y, ydata = remove_bg()[0:3]
 
@@ -165,7 +239,9 @@ def fit_gaussian():
 
 #%%
 def residuals():
-    
+    '''
+    Plots normalised Gaussian fits, original signal data and residuals 
+    '''
     x, y, bimodal, popt2 = fit_gaussian()
 
     pars_1 = popt2[0:3]
@@ -212,6 +288,5 @@ def residuals():
     plt.grid(True)
     plt.show()
 
-
 residuals()
-#%%
+
