@@ -144,7 +144,7 @@ def residuals():
 
     gauss = gauss/area
     y = y/area
-    plt.title(r'Best fit Gaussian and residuals for the $\Upsilon(S3) peak$')
+    plt.title(r'Best fit Gaussian and residuals for the $\Upsilon(3S) peak$')
     #xstart, ystart, xend, yend [units are fraction of the image frame, from bottom left corner]
     plt.plot(x, y, label='signal data') #Noisy data
     plt.plot(x, gauss, label='best fit gaussian') #Best fit model
