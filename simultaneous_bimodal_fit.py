@@ -610,7 +610,7 @@ def residuals():
     #Plot Data-model
     frame1 = fig1.add_axes((.1,.3,.8,.6))
 
-    plt.title(r'Residuals and best fit overlapping Gaussians for the $\Upsilon(S2)$ and $\Upsilon(S3)$ peaks')
+    plt.title(r'Residuals and best fit overlapping Gaussians for the $\Upsilon(2S)$ and $\Upsilon(3S)$ peaks')
     plt.plot(peak_data, gaus_data/area,'m', label='best fit gaussians')
     plt.plot(peak_data, clear_data/area,'k',linewidth=0.8, label='signal data')
 
