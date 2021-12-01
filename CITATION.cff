@@ -1,12 +1,11 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+title: DAH-Project
+message: 'If you use this software, please cite it as below.'
+type: software
 authors:
-- family-names: "Antoniadou"
-  given-names: "Faidra"
-- family-names: "Clarke"
-  given-names: "Niamh"
-title: "DAH-Project"
-version: 1.0.0
-doi: 10.5281/zenodo.1234
-date-released: 2021-11-29
-url: "https://github.com/faantoniadou/DAH-Project"
+  - given-names: Faidra
+    family-names: Antoniadou
+    email: s1809625@ed.ac.uk
+  - given-names: Niamh
+    family-names: Clarke
+    email: s1712100@ed.ac.uk
