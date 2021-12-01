@@ -180,7 +180,7 @@ def plot_gaussian():
     pylab.plot(x, gauss/area, 'm', label='best fit gaussian')
     pylab.plot(x, y/area,'k', label='signal data')
     pylab.ylim(0)
-    pylab.title(r'Normalised gaussian fit of data for the $\Upsilon(S1)$ peak')
+    pylab.title(r'Normalised gaussian fit of data for the $\Upsilon(1S)$ peak')
     pylab.xlabel(xmass_name)
     plt.xticks(np.arange(9, 9.80, 0.15))
     pylab.ylabel(xmass_units)
@@ -204,7 +204,7 @@ def residuals():
     gauss = gauss/area
     y = y/area
 
-    plt.title(r'Best fit Gaussian and residuals for the $\Upsilon(S1)$ peak ')
+    plt.title(r'Best fit Gaussian and residuals for the $\Upsilon(1S)$ peak ')
     #xstart, ystart, xend, yend [units are fraction of the image frame, from bottom left corner]
     plt.plot(x, y, 'k-',linewidth=0.8,label='signal data') #Noisy data
     plt.plot(x, gauss,'m', label='best fit gaussian') #Best fit model
@@ -249,7 +249,7 @@ def plot_composite():
     pylab.xlabel(xmass_name)
     pylab.ylabel(xmass_units)
     plt.xticks(np.arange(9, 9.80, 0.15))
-    pylab.title(r'Normalised composite probability curve for the $\Upsilon(S1)$ peak')
+    pylab.title(r'Normalised composite probability curve for the $\Upsilon(1S)$ peak')
     plot_histogram(xmass_name, region1, xmass_units, True)
 plot_composite()
 
