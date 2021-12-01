@@ -310,15 +310,15 @@ delta_n2_n1 = (7.407936083487728E-05, 4.763755303248949e-05, 5.660411224335539e-
 n3_n1 = (0.12341806390912437,0.13284935445783208, 0.1453851109305531, 0.16676013556635055, 0.18088731832609958)
 delta_n3_n1 = (4.54134580633532e-05, 2.9939911990855904e-05, 3.6558160586191566e-05, 5.4139153579428896e-05, 0.0001278535384062904)
 
-plt.scatter(pT, n2_n1, c = 'black',marker = "v", s = 14, label = 'N(S2)/N(S1)')
-plt.scatter(pT, n3_n1, c = 'blue', marker = "^", s = 14, label = 'N(S3)/N(S1)')
+plt.scatter(pT, n2_n1, c = 'black',marker = "v", s = 14, label = 'N(2S)/N(1S)')
+plt.scatter(pT, n3_n1, c = 'blue', marker = "^", s = 14, label = 'N(3S)/N(1S)')
 
-plt.errorbar(pT, n3_n1, xerr = 0.5, yerr = delta_n3_n1, capsize = 0, ls='none', color= 'blue')
+plt.errorbar(pT, n3_n1, xerr = 1, yerr = delta_n3_n1, capsize = 0, ls='none', color= 'blue')
 
 plt.legend()
-plt.errorbar(pT, n2_n1, xerr = 0.5, yerr = delta_n2_n1, capsize = 0, ls='none', color= 'black')
-plt.xticks(np.arange(0, 11))
+plt.errorbar(pT, n2_n1, xerr = 1, yerr = delta_n2_n1, capsize = 0, ls='none', color= 'black')
+plt.xticks(np.arange(0, 10, 2))
 plt.xlabel("Dimuon $p_T$ bins $[GeV/c]$")
-plt.ylabel("Ratio N(Sx)/N(S1)")
-plt.title("Ratios N(S2)/N(S1) and N(S3)/N(S1) produced, binned by $p_T$")
+plt.ylabel("Ratio N(xS)/N(1S)")
+plt.title("Ratios N(2S)/N(1S) and N(3S)/N(1S) produced, binned by $p_T$")
 plt.show()
