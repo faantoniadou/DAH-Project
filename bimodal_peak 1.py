@@ -13,7 +13,7 @@ import scipy.integrate as integrate
 from scipy.integrate import quad
 
 
-f  =  open("ups-15-small.bin","rb")
+f  =  open("ups-15.bin","rb")
 datalist  =  np.fromfile(f, dtype=np.float32)
 #  number  of  events
 nevent  =  int(len(datalist)/6)
@@ -200,7 +200,7 @@ def plot_gaussian():
     
     pylab.plot(x, y/area, 'k', linewidth=0.8, label='signal data')
     pylab.ylim(0)
-    pylab.title(r'Normalised composite probability curve for the $\Upsilon$(S1) peak')
+    pylab.title(r'Normalised composite probability curve for the $\Upsilon$(1S) peak')
     pylab.xlabel(xmass_name)
     pylab.xticks(np.arange(9, 9.80, 0.15))
     pylab.ylabel(xmass_units)
@@ -261,7 +261,7 @@ def plot_composite():
     pylab.xticks(np.arange(9, 9.80, 0.15))
     pylab.legend()
     plt.ylim(0)
-    pylab.title(r'Normalised composite probability curve for the $\Upsilon$(S1) peak')
+    pylab.title(r'Normalised composite probability curve for the $\Upsilon$(1S) peak')
     #plot_histogram(xmass_name, region1, xmass_units, True)
     
     pylab.show()
