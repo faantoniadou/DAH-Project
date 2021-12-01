@@ -292,10 +292,14 @@ def remove_bg(region_array, edges_array):
 
     Returns
     -------
-    popt[0]: float
-            best-fit starting counts
-    popt[1]: float
-            best-fit decay rate
+    all_masses: array
+                midpoint of binned histogram masses
+    clear_data: array
+                signal data after background is removed
+    exp_fit: array
+            exponential background fit y coordinates
+    x: array
+        a set of points to plot our exponential fit against
 
     '''
 
