@@ -1,5 +1,5 @@
 # Data Analysis and Handling Project Report (F1):
-# Comparison of Maximum likelihood fits as a means of calculating the masses of the Υ(S1), Υ(S2) and Υ(S3) meson states. 
+# Comparison of Maximum likelihood fits as a means of calculating the masses of the Υ(1S), Υ(2S) and Υ(3S) meson states. 
 
 ## Overview 
 
