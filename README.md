@@ -13,6 +13,8 @@ Adapt an outlier detection method to perform cuts in signal data, by considering
 
 3. Adapt an outlier detection method to perform cuts in signal data, by considering data from kinematic properties of particles (e.g. higher/lower momenta particles are more likely to be contamination). This removes unwanted background from the mass spectrum which are events accepted by trigger but are probably not upsilon candidates. After performing these cuts, a different exponential fit can be used to model the remaining background.
 
+4. Change the region where exp background is estimated to be further away from signal regions. This will ensure that only background events are considered when performing an exponential fit to the background, even though less data points will be inputted in our minimizer.
+
 ## Usage
 Our repository (https://github.com/faantoniadou/DAH-Project) includes files which perform fits for either of the two models, separately for each peak and for all peaks simultaneously. Generally, functions are repetitive amongst each file, so for **full commenting and documentation please turn to the simultaneous_bimodal_fit.py file**. The breakdown below explains the structure:
 ### Single Gaussian fits:
@@ -37,7 +39,7 @@ Histograms of all data properties can be plotted through `histogram_plots.py`
 **All abovementioned files can be downloaded from our repository and ran separately on any scientific environment for Python.**
 
 ## Contributors 
-This project exists thanks to all the people who contributed.
+This project exists thanks to Faidra Antoniadou and Niamh Clarke who contributed.
 
 <a href="https://github.com/faantoniadou"><img src="https://avatars.githubusercontent.com/u/63123583?v=4" /></a>
 <a href="https://github.com/niamhyclarke"><img src="https://avatars.githubusercontent.com/u/72151616?v=4" /></a>
