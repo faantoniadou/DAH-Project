@@ -11,6 +11,8 @@ Potential improvements in our method include:
 2. Using CrystalBall functions to fit our peaks instead of overlapped gaussians as this could potentially decrease the magnitude of residuals and improve their spread.
 Adapt an outlier detection method to perform cuts in signal data, by considering data from kinematic properties of particles (e.g. higher/lower momenta particles are more likely to be contamination). This removes unwanted background from the mass spectrum. After performing these cuts, a different exponential fit can be used to model the remaining background.
 
+3. Adapt an outlier detection method to perform cuts in signal data, by considering data from kinematic properties of particles (e.g. higher/lower momenta particles are more likely to be contamination). This removes unwanted background from the mass spectrum which are events accepted by trigger but are probably not upsilon candidates. After performing these cuts, a different exponential fit can be used to model the remaining background.
+
 ## Usage
 Our repository (https://github.com/faantoniadou/DAH-Project) includes files which perform fits for either of the two models, separately for each peak and for all peaks simultaneously. Generally, functions are repetitive amongst each file, so for **full commenting and documentation please turn to the simultaneous_bimodal_fit.py file**. The breakdown below explains the structure:
 ### Single Gaussian fits:
